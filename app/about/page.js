@@ -1,4 +1,5 @@
 import { getContent } from '@/lib/data';
+import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
 export const metadata = { title: 'About — AgriBot' };
@@ -13,20 +14,28 @@ export default async function AboutPage() {
         {about.body}
       </div>
       <div className="mt-10 grid gap-6 sm:grid-cols-2">
-        <div className="card">
-          <h3 className="font-bold text-leaf-800">🎯 Our Mission</h3>
-          <p className="mt-2 text-gray-600 text-sm">
-            Make expert agricultural knowledge accessible to every farmer in Sri
-            Lanka, regardless of location or education level.
-          </p>
-        </div>
-        <div className="card">
-          <h3 className="font-bold text-leaf-800">🌏 Our Vision</h3>
-          <p className="mt-2 text-gray-600 text-sm">
-            A future where technology empowers rural farming communities to plan
-            confidently and prosper sustainably.
-          </p>
-        </div>
+        <Reveal className="h-full">
+          <div className="card-static h-full">
+            <h3 className="font-bold text-leaf-800">
+              <span aria-hidden="true">🎯</span> Our Mission
+            </h3>
+            <p className="mt-2 text-gray-600 text-sm">
+              Make expert agricultural knowledge accessible to every farmer in Sri
+              Lanka, regardless of location or education level.
+            </p>
+          </div>
+        </Reveal>
+        <Reveal delay={100} className="h-full">
+          <div className="card-static h-full">
+            <h3 className="font-bold text-leaf-800">
+              <span aria-hidden="true">🌏</span> Our Vision
+            </h3>
+            <p className="mt-2 text-gray-600 text-sm">
+              A future where technology empowers rural farming communities to plan
+              confidently and prosper sustainably.
+            </p>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

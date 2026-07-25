@@ -1,4 +1,5 @@
 import { getContent } from '@/lib/data';
+import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
 export const metadata = { title: 'Contact — AgriBot' };
@@ -13,29 +14,35 @@ export default async function ContactPage() {
         Questions or feedback about AgriBot? We would love to hear from you.
       </p>
       <div className="mt-10 grid gap-5">
-        <div className="card flex items-center gap-4">
-          <span className="text-3xl">📧</span>
-          <div>
-            <p className="font-semibold text-leaf-800">Email</p>
-            <a href={`mailto:${contact.email}`} className="text-leaf-600 hover:underline">
-              {contact.email}
-            </a>
+        <Reveal>
+          <div className="card-static flex items-center gap-4">
+            <span className="text-3xl" aria-hidden="true">📧</span>
+            <div>
+              <p className="font-semibold text-leaf-800">Email</p>
+              <a href={`mailto:${contact.email}`} className="link-underline text-leaf-600">
+                {contact.email}
+              </a>
+            </div>
           </div>
-        </div>
-        <div className="card flex items-center gap-4">
-          <span className="text-3xl">📞</span>
-          <div>
-            <p className="font-semibold text-leaf-800">Phone</p>
-            <p className="text-gray-600">{contact.phone}</p>
+        </Reveal>
+        <Reveal delay={80}>
+          <div className="card flex items-center gap-4">
+            <span className="text-3xl" aria-hidden="true">📞</span>
+            <div>
+              <p className="font-semibold text-leaf-800">Phone</p>
+              <p className="text-gray-600">{contact.phone}</p>
+            </div>
           </div>
-        </div>
-        <div className="card flex items-center gap-4">
-          <span className="text-3xl">📍</span>
-          <div>
-            <p className="font-semibold text-leaf-800">Location</p>
-            <p className="text-gray-600">{contact.address}</p>
+        </Reveal>
+        <Reveal delay={160}>
+          <div className="card flex items-center gap-4">
+            <span className="text-3xl" aria-hidden="true">📍</span>
+            <div>
+              <p className="font-semibold text-leaf-800">Location</p>
+              <p className="text-gray-600">{contact.address}</p>
+            </div>
           </div>
-        </div>
+        </Reveal>
       </div>
     </section>
   );

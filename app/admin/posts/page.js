@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import ImageUpload from '@/components/ImageUpload';
+import Spinner from '@/components/motion/Spinner';
+import { ErrorMessage } from '@/components/ui/StatusMessage';
+import { SkeletonRegion, AdminRowSkeleton } from '@/components/ui/Skeleton';
 
 const empty = { title: '', slug: '', excerpt: '', content: '', cover_url: '', published: false };
 
@@ -15,6 +18,10 @@ export default function AdminPosts() {
   const [form, setForm] = useState(null); // null = list view
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  // Without this the list renders "No posts yet" while the fetch is still in
+  // flight, inviting the admin to re-create content that already exists.
+  const [loading, setLoading] = useState(true);
+  const [pendingId, setPendingId] = useState(null);
 
   async function load() {
     const { data } = await supabase
@@ -22,6 +29,7 @@ export default function AdminPosts() {
       .select('*')
       .order('created_at', { ascending: false });
     setPosts(data ?? []);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -44,13 +52,38 @@ export default function AdminPosts() {
 
   async function remove(id) {
     if (!confirm('Delete this post?')) return;
-    await supabase.from('posts').delete().eq('id', id);
-    load();
+    setPendingId(id);
+    setError('');
+    const { error: err } = await supabase.from('posts').delete().eq('id', id);
+    if (err) {
+      setError(err.message);
+      setPendingId(null);
+      return;
+    }
+    await load();
+    setPendingId(null);
   }
 
   async function togglePublish(p) {
-    await supabase.from('posts').update({ published: !p.published }).eq('id', p.id);
-    load();
+    setPendingId(p.id);
+    setError('');
+    // Flip the pill immediately, roll back if the write fails — the state
+    // change is the answer to the click, not the round trip.
+    const next = !p.published;
+    setPosts((cur) =>
+      cur.map((row) => (row.id === p.id ? { ...row, published: next } : row))
+    );
+    const { error: err } = await supabase
+      .from('posts')
+      .update({ published: next })
+      .eq('id', p.id);
+    if (err) {
+      setError(err.message);
+      setPosts((cur) =>
+        cur.map((row) => (row.id === p.id ? { ...row, published: p.published } : row))
+      );
+    }
+    setPendingId(null);
   }
 
   if (form) {
@@ -110,12 +143,18 @@ export default function AdminPosts() {
             />
             Published (visible on the site)
           </label>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          <ErrorMessage>{error}</ErrorMessage>
           <div className="flex gap-3">
-            <button type="submit" disabled={busy} className="btn-primary disabled:opacity-50">
+            <button type="submit" disabled={busy} className="btn-primary">
+              {busy && <Spinner />}
               {busy ? 'Saving…' : 'Save'}
             </button>
-            <button type="button" onClick={() => setForm(null)} className="btn-secondary">
+            <button
+              type="button"
+              onClick={() => setForm(null)}
+              disabled={busy}
+              className="btn-secondary"
+            >
               Cancel
             </button>
           </div>
@@ -132,37 +171,64 @@ export default function AdminPosts() {
           ＋ New Post
         </button>
       </div>
-      <div className="mt-6 space-y-3">
-        {posts.length === 0 && (
-          <p className="text-gray-500">No posts yet. Create your first one!</p>
-        )}
-        {posts.map((p) => (
-          <div key={p.id} className="card flex items-center gap-4">
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-leaf-900 truncate">{p.title}</p>
-              <p className="text-xs text-gray-400">
-                /news/{p.slug} · {new Date(p.created_at).toLocaleDateString()}
-              </p>
-            </div>
-            <button
-              onClick={() => togglePublish(p)}
-              className={`text-xs font-semibold px-3 py-1.5 rounded-full ${
-                p.published
-                  ? 'bg-leaf-100 text-leaf-700'
-                  : 'bg-gray-100 text-gray-500'
+      <ErrorMessage className="mt-4">{error}</ErrorMessage>
+
+      {loading ? (
+        <SkeletonRegion label="Loading posts" className="mt-6 space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <AdminRowSkeleton key={i} />
+          ))}
+        </SkeletonRegion>
+      ) : (
+        <div className="mt-6 space-y-3">
+          {posts.length === 0 && (
+            <p className="text-gray-500">No posts yet. Create your first one!</p>
+          )}
+          {posts.map((p) => (
+            <div
+              key={p.id}
+              aria-busy={pendingId === p.id}
+              className={`card flex items-center gap-4 transition-opacity duration-200 ${
+                pendingId === p.id ? 'opacity-60' : ''
               }`}
             >
-              {p.published ? 'Published' : 'Draft'}
-            </button>
-            <button onClick={() => setForm(p)} className="text-sm text-leaf-600 font-medium hover:underline">
-              Edit
-            </button>
-            <button onClick={() => remove(p.id)} className="text-sm text-red-500 font-medium hover:underline">
-              Delete
-            </button>
-          </div>
-        ))}
-      </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-leaf-900 truncate">{p.title}</p>
+                <p className="text-xs text-gray-400">
+                  /news/{p.slug} · {new Date(p.created_at).toLocaleDateString()}
+                </p>
+              </div>
+              <button
+                onClick={() => togglePublish(p)}
+                disabled={pendingId === p.id}
+                aria-pressed={p.published}
+                className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors duration-200 disabled:opacity-50 ${
+                  p.published
+                    ? 'bg-leaf-100 text-leaf-700 hover:bg-leaf-200'
+                    : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                }`}
+              >
+                {p.published ? 'Published' : 'Draft'}
+              </button>
+              <button
+                onClick={() => setForm(p)}
+                disabled={pendingId === p.id}
+                className="text-sm font-medium text-leaf-600 transition-colors hover:text-leaf-800 hover:underline disabled:opacity-50"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => remove(p.id)}
+                disabled={pendingId === p.id}
+                className="flex items-center gap-1.5 text-sm font-medium text-red-500 transition-colors hover:text-red-700 hover:underline disabled:opacity-50"
+              >
+                {pendingId === p.id && <Spinner />}
+                Delete
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

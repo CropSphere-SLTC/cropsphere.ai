@@ -1,4 +1,5 @@
 import { getFeatures } from '@/lib/data';
+import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
 export const metadata = { title: 'Features — AgriBot' };
@@ -14,13 +15,15 @@ export default async function FeaturesPage() {
       </p>
       <div className="mt-12 grid gap-6 sm:grid-cols-2">
         {features.map((f, i) => (
-          <div key={i} className="card flex gap-5 items-start hover:shadow-md transition-shadow">
-            <div className="text-4xl shrink-0">{f.icon}</div>
-            <div>
-              <h3 className="font-bold text-leaf-800 text-lg">{f.title}</h3>
-              <p className="mt-2 text-gray-600">{f.description}</p>
+          <Reveal key={i} delay={Math.min(i, 5) * 80} className="h-full">
+            <div className="card-static flex h-full gap-5 items-start">
+              <div className="text-4xl shrink-0" aria-hidden="true">{f.icon}</div>
+              <div>
+                <h3 className="font-bold text-leaf-800 text-lg">{f.title}</h3>
+                <p className="mt-2 text-gray-600">{f.description}</p>
+              </div>
             </div>
-          </div>
+          </Reveal>
         ))}
       </div>
     </section>

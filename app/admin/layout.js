@@ -4,12 +4,15 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase, supabaseConfigured } from '@/lib/supabase';
+import BrandMark from '@/components/brand/BrandMark';
+import BrandLoader from '@/components/brand/BrandLoader';
+import Spinner from '@/components/motion/Spinner';
 
 const nav = [
-  { href: '/admin', label: '📊 Dashboard' },
-  { href: '/admin/posts', label: '📰 News & Newsletters' },
-  { href: '/admin/team', label: '👥 Team' },
-  { href: '/admin/content', label: '📝 Site Content' },
+  { href: '/admin', icon: '📊', label: 'Dashboard' },
+  { href: '/admin/posts', icon: '📰', label: 'News & Newsletters' },
+  { href: '/admin/team', icon: '👥', label: 'Team' },
+  { href: '/admin/content', icon: '📝', label: 'Site Content' },
 ];
 
 export default function AdminLayout({ children }) {
@@ -17,6 +20,7 @@ export default function AdminLayout({ children }) {
   const router = useRouter();
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
   const isLogin = pathname === '/admin/login';
 
   useEffect(() => {
@@ -53,8 +57,8 @@ export default function AdminLayout({ children }) {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-gray-500">
-        Loading…
+      <div className="min-h-screen flex items-center justify-center">
+        <BrandLoader size={96} label="Checking your session…" />
       </div>
     );
   }
@@ -62,38 +66,51 @@ export default function AdminLayout({ children }) {
   if (!session) return null;
 
   async function logout() {
+    setLoggingOut(true);
     await supabase.auth.signOut();
     router.replace('/admin/login');
   }
 
   return (
     <div className="min-h-screen bg-leaf-50 flex">
-      <aside className="w-64 bg-leaf-900 text-leaf-100 flex flex-col shrink-0">
-        <div className="p-5 font-extrabold text-white text-lg border-b border-leaf-800">
-          🌱 AgriBot Admin
+      <aside className="on-dark w-64 bg-leaf-900 text-leaf-100 flex flex-col shrink-0">
+        <div className="flex items-center gap-2 p-5 font-extrabold text-white text-lg border-b border-leaf-800">
+          <BrandMark size={26} /> AgriBot Admin
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {nav.map((n) => (
             <Link
               key={n.href}
               href={n.href}
-              className={`block px-3 py-2.5 rounded-lg text-sm font-medium transition-colors ${
-                pathname === n.href ? 'bg-leaf-700 text-white' : 'hover:bg-leaf-800'
+              aria-current={pathname === n.href ? 'page' : undefined}
+              className={`relative block rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200 ${
+                pathname === n.href
+                  ? 'bg-leaf-700 text-white'
+                  : 'hover:bg-leaf-800'
               }`}
             >
-              {n.label}
+              {/* Active marker in addition to colour (WCAG 1.4.1). */}
+              <span
+                aria-hidden="true"
+                className={`absolute left-0 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r bg-grain transition-transform duration-200 ease-out-expo ${
+                  pathname === n.href ? 'scale-y-100' : 'scale-y-0'
+                }`}
+              />
+              <span aria-hidden="true">{n.icon}</span> {n.label}
             </Link>
           ))}
         </nav>
         <div className="p-3 border-t border-leaf-800 space-y-1">
-          <Link href="/" className="block px-3 py-2 rounded-lg text-sm hover:bg-leaf-800">
-            🌐 View Site
+          <Link href="/" className="block px-3 py-2 rounded-lg text-sm transition-colors hover:bg-leaf-800">
+            <span aria-hidden="true">🌐</span> View Site
           </Link>
           <button
             onClick={logout}
-            className="w-full text-left px-3 py-2 rounded-lg text-sm hover:bg-leaf-800"
+            disabled={loggingOut}
+            className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-colors hover:bg-leaf-800 disabled:opacity-60"
           >
-            🚪 Log out
+            {loggingOut ? <Spinner /> : <span aria-hidden="true">🚪</span>}
+            {loggingOut ? 'Logging out…' : 'Log out'}
           </button>
         </div>
       </aside>

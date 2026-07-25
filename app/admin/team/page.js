@@ -3,6 +3,9 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import ImageUpload from '@/components/ImageUpload';
+import Spinner from '@/components/motion/Spinner';
+import { ErrorMessage } from '@/components/ui/StatusMessage';
+import { SkeletonRegion, AdminRowSkeleton } from '@/components/ui/Skeleton';
 
 const empty = { name: '', role: '', bio: '', photo_url: '', sort_order: 0 };
 
@@ -11,6 +14,8 @@ export default function AdminTeam() {
   const [form, setForm] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(true);
+  const [pendingId, setPendingId] = useState(null);
 
   async function load() {
     const { data } = await supabase
@@ -18,6 +23,7 @@ export default function AdminTeam() {
       .select('*')
       .order('sort_order', { ascending: true });
     setTeam(data ?? []);
+    setLoading(false);
   }
 
   useEffect(() => {
@@ -40,8 +46,16 @@ export default function AdminTeam() {
 
   async function remove(id) {
     if (!confirm('Remove this team member?')) return;
-    await supabase.from('team_members').delete().eq('id', id);
-    load();
+    setPendingId(id);
+    setError('');
+    const { error: err } = await supabase.from('team_members').delete().eq('id', id);
+    if (err) {
+      setError(err.message);
+      setPendingId(null);
+      return;
+    }
+    await load();
+    setPendingId(null);
   }
 
   if (form) {
@@ -92,12 +106,18 @@ export default function AdminTeam() {
               onChange={(e) => setForm({ ...form, sort_order: e.target.value })}
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          <ErrorMessage>{error}</ErrorMessage>
           <div className="flex gap-3">
-            <button type="submit" disabled={busy} className="btn-primary disabled:opacity-50">
+            <button type="submit" disabled={busy} className="btn-primary">
+              {busy && <Spinner />}
               {busy ? 'Saving…' : 'Save'}
             </button>
-            <button type="button" onClick={() => setForm(null)} className="btn-secondary">
+            <button
+              type="button"
+              onClick={() => setForm(null)}
+              disabled={busy}
+              className="btn-secondary"
+            >
               Cancel
             </button>
           </div>
@@ -114,29 +134,59 @@ export default function AdminTeam() {
           ＋ Add Member
         </button>
       </div>
-      <div className="mt-6 space-y-3">
-        {team.length === 0 && <p className="text-gray-500">No team members yet.</p>}
-        {team.map((m) => (
-          <div key={m.id} className="card flex items-center gap-4">
-            {m.photo_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={m.photo_url} alt="" className="w-12 h-12 rounded-full object-cover" />
-            ) : (
-              <div className="w-12 h-12 rounded-full bg-leaf-100 flex items-center justify-center">👤</div>
-            )}
-            <div className="flex-1 min-w-0">
-              <p className="font-semibold text-leaf-900">{m.name}</p>
-              <p className="text-sm text-gray-500">{m.role}</p>
+      <ErrorMessage className="mt-4">{error}</ErrorMessage>
+
+      {loading ? (
+        <SkeletonRegion label="Loading team members" className="mt-6 space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <AdminRowSkeleton key={i} avatar />
+          ))}
+        </SkeletonRegion>
+      ) : (
+        <div className="mt-6 space-y-3">
+          {team.length === 0 && <p className="text-gray-500">No team members yet.</p>}
+          {team.map((m) => (
+            <div
+              key={m.id}
+              aria-busy={pendingId === m.id}
+              className={`card flex items-center gap-4 transition-opacity duration-200 ${
+                pendingId === m.id ? 'opacity-60' : ''
+              }`}
+            >
+              {m.photo_url ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={m.photo_url} alt="" className="w-12 h-12 rounded-full object-cover" />
+              ) : (
+                <div
+                  className="w-12 h-12 rounded-full bg-leaf-100 flex items-center justify-center"
+                  aria-hidden="true"
+                >
+                  👤
+                </div>
+              )}
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-leaf-900">{m.name}</p>
+                <p className="text-sm text-gray-500">{m.role}</p>
+              </div>
+              <button
+                onClick={() => setForm(m)}
+                disabled={pendingId === m.id}
+                className="text-sm font-medium text-leaf-600 transition-colors hover:text-leaf-800 hover:underline disabled:opacity-50"
+              >
+                Edit
+              </button>
+              <button
+                onClick={() => remove(m.id)}
+                disabled={pendingId === m.id}
+                className="flex items-center gap-1.5 text-sm font-medium text-red-500 transition-colors hover:text-red-700 hover:underline disabled:opacity-50"
+              >
+                {pendingId === m.id && <Spinner />}
+                Delete
+              </button>
             </div>
-            <button onClick={() => setForm(m)} className="text-sm text-leaf-600 font-medium hover:underline">
-              Edit
-            </button>
-            <button onClick={() => remove(m.id)} className="text-sm text-red-500 font-medium hover:underline">
-              Delete
-            </button>
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import Spinner from '@/components/motion/Spinner';
+import { ErrorMessage, StatusMessage } from '@/components/ui/StatusMessage';
 
 // Uploads an image to the public "images" storage bucket and returns its URL.
 export default function ImageUpload({ value, onChange, label = 'Image' }) {
@@ -25,20 +27,39 @@ export default function ImageUpload({ value, onChange, label = 'Image' }) {
   }
 
   return (
-    <div>
+    <div aria-busy={busy}>
       <label className="label">{label}</label>
       {value && (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={value} alt="" className="h-24 rounded-lg object-cover mb-2" />
+        <img
+          key={value}
+          src={value}
+          alt=""
+          className="animate-scale-in h-24 rounded-lg object-cover mb-2"
+        />
       )}
-      <input type="file" accept="image/*" onChange={handleFile} className="text-sm" />
-      {busy && <p className="text-sm text-gray-500">Uploading…</p>}
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      <input
+        type="file"
+        accept="image/*"
+        onChange={handleFile}
+        // Was enabled during upload, so a second file could be picked mid-flight.
+        disabled={busy}
+        className="text-sm disabled:cursor-not-allowed disabled:opacity-50"
+      />
+      <StatusMessage className="mt-1 flex items-center gap-2 text-gray-500">
+        {busy ? (
+          <>
+            <Spinner /> Uploading…
+          </>
+        ) : null}
+      </StatusMessage>
+      <ErrorMessage className="mt-1">{error}</ErrorMessage>
       {value && (
         <button
           type="button"
           onClick={() => onChange('')}
-          className="block text-xs text-red-500 mt-1 hover:underline"
+          disabled={busy}
+          className="mt-1 block text-xs text-red-500 transition-colors hover:text-red-700 hover:underline disabled:opacity-50"
         >
           Remove image
         </button>

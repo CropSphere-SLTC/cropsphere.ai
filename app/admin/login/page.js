@@ -3,6 +3,9 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, supabaseConfigured } from '@/lib/supabase';
+import BrandMark from '@/components/brand/BrandMark';
+import Spinner from '@/components/motion/Spinner';
+import { ErrorMessage } from '@/components/ui/StatusMessage';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,7 +31,9 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex items-center justify-center p-6">
       <form onSubmit={handleLogin} className="card w-full max-w-sm">
-        <p className="text-center text-3xl">🌱</p>
+        <div className="flex justify-center">
+          <BrandMark size={52} variant="grow" />
+        </div>
         <h1 className="mt-2 text-xl font-bold text-center text-leaf-900">
           AgriBot Admin Login
         </h1>
@@ -53,8 +58,9 @@ export default function LoginPage() {
               required
             />
           </div>
-          {error && <p className="text-sm text-red-600">{error}</p>}
-          <button type="submit" disabled={busy} className="btn-primary w-full disabled:opacity-50">
+          <ErrorMessage>{error}</ErrorMessage>
+          <button type="submit" disabled={busy} className="btn-primary w-full">
+            {busy && <Spinner />}
             {busy ? 'Logging in…' : 'Log in'}
           </button>
         </div>

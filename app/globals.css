@@ -1,8 +1,17 @@
+/* Font must be imported before the Tailwind directives — @import is only
+   valid at the top of a stylesheet. */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+:root {
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast: 150ms;
+  --dur-base: 250ms;
+  --dur-slow: 450ms;
+}
 
 html {
   scroll-behavior: smooth;
@@ -17,15 +26,34 @@ body {
 }
 
 .btn-primary {
-  @apply inline-block bg-leaf-600 text-white font-semibold px-6 py-3 rounded-xl shadow-sm hover:bg-leaf-700 transition-colors;
+  @apply inline-flex items-center justify-center gap-2 bg-leaf-600 text-white font-semibold px-6 py-3 rounded-xl shadow-sm
+         transition-[background-color,transform,box-shadow] duration-200 ease-out-expo
+         hover:bg-leaf-700 hover:shadow-md active:scale-[.98]
+         disabled:opacity-50 disabled:pointer-events-none;
 }
 
 .btn-secondary {
-  @apply inline-block bg-white text-leaf-700 font-semibold px-6 py-3 rounded-xl border border-leaf-200 hover:border-leaf-400 transition-colors;
+  @apply inline-flex items-center justify-center gap-2 bg-white text-leaf-700 font-semibold px-6 py-3 rounded-xl border border-leaf-200
+         transition-[border-color,background-color,transform,box-shadow] duration-200 ease-out-expo
+         hover:border-leaf-400 hover:shadow-sm active:scale-[.98]
+         disabled:opacity-50 disabled:pointer-events-none;
 }
 
 .card {
   @apply bg-white rounded-2xl border border-leaf-100 shadow-sm p-6;
+}
+
+/* Only for cards that are genuinely clickable — a lift on a static card is a
+   false affordance. */
+.card-link {
+  @apply card transition-[transform,box-shadow,border-color] duration-200 ease-out-expo
+         hover:-translate-y-1 hover:shadow-lg hover:border-leaf-200
+         active:translate-y-0 active:shadow-md;
+}
+
+/* Non-interactive cards get a gentler hover that promises nothing. */
+.card-static {
+  @apply card transition-shadow duration-200 hover:shadow-md;
 }
 
 .section-title {
@@ -33,9 +61,193 @@ body {
 }
 
 .input {
-  @apply w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-leaf-400 focus:border-leaf-400;
+  @apply w-full rounded-lg border border-gray-300 px-3 py-2 transition-[border-color,box-shadow] duration-150
+         focus:outline-none focus:ring-2 focus:ring-leaf-400 focus:border-leaf-400
+         disabled:bg-gray-50 disabled:text-gray-400 disabled:cursor-not-allowed;
 }
 
 .label {
   @apply block text-sm font-medium text-gray-700 mb-1;
+}
+
+/* Underline that grows from the left instead of snapping on. Directional
+   growth signifies "this leads somewhere"; aria-current keeps it drawn, so the
+   active page is marked by more than colour alone (WCAG 1.4.1). */
+.link-underline {
+  background-image: linear-gradient(currentColor, currentColor);
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1.5px;
+  transition: background-size var(--dur-base) var(--ease-out-expo);
+  text-decoration: none;
+}
+.link-underline:hover,
+.link-underline:focus-visible,
+.link-underline[aria-current='page'] {
+  background-size: 100% 1.5px;
+}
+
+/* --- Focus visibility (WCAG 2.4.7) ------------------------------------- */
+
+:focus-visible {
+  outline: 2px solid theme('colors.leaf.600');
+  outline-offset: 3px;
+  border-radius: 6px;
+}
+
+/* leaf-600 has too little contrast against the dark green grounds (footer,
+   admin sidebar, CTA panel). Switch the ring to the logo's seed gold there. */
+.on-dark :focus-visible {
+  outline-color: theme('colors.grain');
+}
+
+.skip-link {
+  @apply sr-only;
+}
+.skip-link:focus {
+  @apply not-sr-only fixed top-3 left-3 z-[100] bg-white text-leaf-800 font-semibold
+         px-4 py-2 rounded-lg shadow-lg ring-2 ring-leaf-500;
+}
+
+/* --- Scroll reveal ------------------------------------------------------
+   The hiding rule is scoped to `html.js`, a class set by an inline <head>
+   script. Server HTML is therefore fully visible for crawlers and no-JS
+   visitors, and the hide is applied before first paint when JS is on — so
+   there is no flash of hidden content either way. */
+
+html.js [data-reveal] {
+  opacity: 0;
+  transform: translateY(16px);
+  /* Failsafe: if the `js` class lands but hydration never completes, this
+     forces the content visible after 4s with no JS involved. */
+  animation: reveal-failsafe 1ms linear 4s forwards;
+}
+
+html.js [data-reveal='shown'] {
+  opacity: 1;
+  transform: none;
+  transition: opacity var(--dur-slow) var(--ease-out-expo) var(--reveal-delay, 0ms),
+              transform var(--dur-slow) var(--ease-out-expo) var(--reveal-delay, 0ms);
+}
+
+@keyframes reveal-failsafe {
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The How It Works connector draws downward as each step reveals, so the
+   steps read as one sequence rather than four cards, and the draw direction
+   encodes the reading order. Gated the same way as the reveal itself: fully
+   drawn when JS is unavailable. */
+.step-connector {
+  transform-origin: top;
+}
+html.js [data-reveal] .step-connector {
+  transform: scaleY(0);
+}
+html.js [data-reveal='shown'] .step-connector {
+  transform: scaleY(1);
+  transition: transform 420ms var(--ease-out-expo) 120ms;
+}
+
+/* --- Skeleton placeholders ---------------------------------------------- */
+
+.skeleton {
+  @apply relative overflow-hidden bg-leaf-100/70 rounded-lg;
+}
+
+.skeleton::after {
+  content: '';
+  @apply absolute inset-0 -translate-x-full animate-shimmer;
+  background-image: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.65),
+    transparent
+  );
+}
+
+/* --- Admin-controlled loading toggles -----------------------------------
+   Flags are stamped onto <html> by the root layout. Using CSS rather than
+   React context lets them reach the route-level loading.js files, which the
+   router renders outside any provider. */
+
+/* Suppressed before first paint on repeat visits — set by the inline script in
+   app/layout.js, so the overlay never flashes while waiting for hydration. */
+html[data-splash-seen='1'] #brand-splash {
+  display: none;
+}
+
+html[data-skeletons='off'] .skeleton-block {
+  display: none;
+}
+html[data-skeletons='off'] .loader-fallback {
+  display: flex;
+}
+html[data-spinners='off'] .btn-spinner {
+  display: none;
+}
+html[data-reveal='off'] .animate-page-enter {
+  animation: none;
+}
+
+/* Used by the reduced-motion carve-out below. Declared here rather than in
+   tailwind.config.js because it is referenced from raw CSS, and Tailwind only
+   emits a @keyframes block when a matching animate-* utility is in the source. */
+@keyframes pulse-soft {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.45;
+  }
+}
+
+/* --- Reduced motion (WCAG 2.3.3) ----------------------------------------
+   Blanket kill, then one carve-out: anything marked data-motion="status" is a
+   loading indicator and keeps animating — but as an opacity pulse only.
+   Opacity does not provoke vestibular responses; translation, rotation and
+   scale do. A frozen spinner is worse feedback than no spinner at all. */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  html.js [data-reveal] {
+    opacity: 1 !important;
+    transform: none !important;
+  }
+
+  html.js [data-reveal] .step-connector {
+    transform: none !important;
+  }
+
+  #brand-splash {
+    display: none !important;
+  }
+
+  [data-motion='status'],
+  [data-motion='status'] *,
+  [data-motion='status'] *::after {
+    animation-name: pulse-soft !important;
+    animation-duration: 1.8s !important;
+    animation-iteration-count: infinite !important;
+    animation-delay: 0ms !important;
+    transform: none !important;
+  }
 }
