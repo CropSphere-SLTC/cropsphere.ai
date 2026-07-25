@@ -2,7 +2,7 @@ import { getTeam } from '@/lib/data';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
-export const metadata = { title: 'Our Team — AgriBot' };
+export const metadata = { title: 'Our Team — Cropsphere.ai' };
 
 export default async function TeamPage() {
   const team = await getTeam();
@@ -11,7 +11,7 @@ export default async function TeamPage() {
     <section className="container-site py-16">
       <h1 className="section-title text-center">Our Team</h1>
       <p className="mt-4 text-center text-gray-600 max-w-2xl mx-auto">
-        The students behind AgriBot — TCC Group.
+        The students behind Cropsphere.ai — TCC Group.
       </p>
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
         {team.map((m, i) => (

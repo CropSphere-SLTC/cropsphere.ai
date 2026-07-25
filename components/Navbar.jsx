@@ -87,13 +87,15 @@ export default function Navbar() {
       <nav className="container-site flex items-center justify-between h-16">
         <Link
           href="/"
-          className="flex items-center gap-2 font-extrabold text-xl text-leaf-700"
+          className="flex shrink-0 items-center gap-2 whitespace-nowrap text-xl font-extrabold text-leaf-700"
         >
           <BrandMark size={30} variant={introMark ? 'grow' : 'static'} />
-          AgriBot
+          Cropsphere.ai
         </Link>
 
-        <ul className="hidden md:flex items-center gap-6">
+        {/* Tighter gap at the md breakpoint: the wordmark is long enough that
+            gap-6 collides with the first link at exactly 768px. */}
+        <ul className="ml-6 hidden items-center gap-4 md:flex lg:gap-6">
           {links.map((l) => (
             <li key={l.href}>
               <Link

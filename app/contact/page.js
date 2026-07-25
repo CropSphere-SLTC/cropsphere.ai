@@ -2,7 +2,7 @@ import { getContent } from '@/lib/data';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
-export const metadata = { title: 'Contact — AgriBot' };
+export const metadata = { title: 'Contact — Cropsphere.ai' };
 
 export default async function ContactPage() {
   const contact = await getContent('contact');
@@ -11,7 +11,7 @@ export default async function ContactPage() {
     <section className="container-site py-16 max-w-2xl">
       <h1 className="section-title text-center">Contact Us</h1>
       <p className="mt-4 text-center text-gray-600">
-        Questions or feedback about AgriBot? We would love to hear from you.
+        Questions or feedback about Cropsphere.ai? We would love to hear from you.
       </p>
       <div className="mt-10 grid gap-5">
         <Reveal>

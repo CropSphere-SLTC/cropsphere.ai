@@ -35,7 +35,7 @@ export default function LoginPage() {
           <BrandMark size={52} variant="grow" />
         </div>
         <h1 className="mt-2 text-xl font-bold text-center text-leaf-900">
-          AgriBot Admin Login
+          Cropsphere.ai Admin Login
         </h1>
         <div className="mt-6 space-y-4">
           <div>

@@ -38,7 +38,7 @@ export default async function HomePage() {
       {/* Features preview */}
       <section className="container-site py-16">
         <Reveal>
-          <h2 className="section-title text-center">What AgriBot Can Do</h2>
+          <h2 className="section-title text-center">What Cropsphere.ai Can Do</h2>
         </Reveal>
         <div className="mt-10 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
           {features.map((f, i) => (
@@ -109,7 +109,7 @@ export default async function HomePage() {
           <div className="on-dark card bg-leaf-700 border-none py-12">
             <h2 className="text-3xl font-bold text-white">Ready to grow smarter?</h2>
             <p className="mt-3 text-leaf-100 max-w-xl mx-auto">
-              Join farmers across Sri Lanka using AgriBot to plan better and earn more.
+              Join farmers across Sri Lanka using Cropsphere.ai to plan better and earn more.
             </p>
             <a href={hero.cta_link || '#'} className="btn-secondary mt-6">{hero.cta}</a>
           </div>

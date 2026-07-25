@@ -6,7 +6,7 @@ export default function Loading() {
     <section className="container-site py-16">
       <h1 className="section-title text-center">Our Team</h1>
       <p className="mt-4 text-center text-gray-600 max-w-2xl mx-auto">
-        The students behind AgriBot — TCC Group.
+        The students behind Cropsphere.ai — TCC Group.
       </p>
 
       <SkeletonRegion

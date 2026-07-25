@@ -10,7 +10,7 @@ const MOTION_TOGGLES = [
   {
     key: 'splash',
     label: 'Startup animation',
-    help: 'Show the animated AgriBot logo when a visitor first opens the site.',
+    help: 'Show the animated Cropsphere.ai logo when a visitor first opens the site.',
   },
   {
     key: 'progress',

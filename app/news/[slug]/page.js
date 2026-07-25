@@ -8,9 +8,9 @@ export const revalidate = 60;
 // navigation. Without this, each article announces the generic site title.
 export async function generateMetadata({ params }) {
   const post = await getPost(params.slug);
-  if (!post) return { title: 'Post not found — AgriBot' };
+  if (!post) return { title: 'Post not found — Cropsphere.ai' };
   return {
-    title: `${post.title} — AgriBot`,
+    title: `${post.title} — Cropsphere.ai`,
     description: post.excerpt || undefined,
   };
 }

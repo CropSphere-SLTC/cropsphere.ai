@@ -1,5 +1,5 @@
 /**
- * The AgriBot sprout mark, hand-authored as inline SVG so each part — stem,
+ * The Cropsphere.ai sprout mark, hand-authored as inline SVG so each part — stem,
  * leaves, and every seed in the flower head — can animate independently.
  *
  * variant:

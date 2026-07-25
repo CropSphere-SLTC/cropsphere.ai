@@ -3,7 +3,7 @@ import { getPosts } from '@/lib/data';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
-export const metadata = { title: 'News — AgriBot' };
+export const metadata = { title: 'News — Cropsphere.ai' };
 
 export default async function NewsPage() {
   const posts = await getPosts();
@@ -12,7 +12,7 @@ export default async function NewsPage() {
     <section className="container-site py-16">
       <h1 className="section-title text-center">News & Newsletters</h1>
       <p className="mt-4 text-center text-gray-600">
-        Updates from the AgriBot project.
+        Updates from the Cropsphere.ai project.
       </p>
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((p, i) => (

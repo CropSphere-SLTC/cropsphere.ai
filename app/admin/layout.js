@@ -75,7 +75,7 @@ export default function AdminLayout({ children }) {
     <div className="min-h-screen bg-leaf-50 flex">
       <aside className="on-dark w-64 bg-leaf-900 text-leaf-100 flex flex-col shrink-0">
         <div className="flex items-center gap-2 p-5 font-extrabold text-white text-lg border-b border-leaf-800">
-          <BrandMark size={26} /> AgriBot Admin
+          <BrandMark size={26} /> Cropsphere.ai Admin
         </div>
         <nav className="flex-1 p-3 space-y-1">
           {nav.map((n) => (

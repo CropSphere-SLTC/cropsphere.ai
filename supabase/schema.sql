@@ -1,4 +1,4 @@
--- AgriBot site schema
+-- Cropsphere.ai site schema
 -- Run this in Supabase Dashboard -> SQL Editor
 
 -- News / newsletter posts

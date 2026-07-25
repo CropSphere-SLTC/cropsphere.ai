@@ -2,7 +2,7 @@ import { getSteps } from '@/lib/data';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
-export const metadata = { title: 'How It Works — AgriBot' };
+export const metadata = { title: 'How It Works — Cropsphere.ai' };
 
 export default async function HowItWorksPage() {
   const steps = await getSteps();

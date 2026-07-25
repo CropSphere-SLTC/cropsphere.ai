@@ -7,7 +7,7 @@ export default function Loading() {
       {/* Identical to app/news/page.js so the heading never moves. */}
       <h1 className="section-title text-center">News &amp; Newsletters</h1>
       <p className="mt-4 text-center text-gray-600">
-        Updates from the AgriBot project.
+        Updates from the Cropsphere.ai project.
       </p>
 
       <SkeletonRegion

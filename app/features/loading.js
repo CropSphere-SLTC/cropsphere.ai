@@ -6,7 +6,7 @@ export default function Loading() {
     <section className="container-site py-16">
       <h1 className="section-title text-center">Features</h1>
       <p className="mt-4 text-center text-gray-600 max-w-2xl mx-auto">
-        Everything AgriBot offers to help you farm smarter.
+        Everything Cropsphere.ai offers to help you farm smarter.
       </p>
 
       <SkeletonRegion

@@ -2,7 +2,7 @@ import { getContent } from '@/lib/data';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
-export const metadata = { title: 'About — AgriBot' };
+export const metadata = { title: 'About — Cropsphere.ai' };
 
 export default async function AboutPage() {
   const about = await getContent('about');

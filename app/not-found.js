@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import BrandMark from '@/components/brand/BrandMark';
 
-export const metadata = { title: 'Page not found — AgriBot' };
+export const metadata = { title: 'Page not found — Cropsphere.ai' };
 
 export default function NotFound() {
   return (

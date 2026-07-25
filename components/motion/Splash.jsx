@@ -37,7 +37,7 @@ export default function Splash() {
     >
       <BrandMark size={120} variant="grow" />
       <p className="animate-fade-in text-xl font-extrabold tracking-tight text-leaf-700 [animation-delay:800ms]">
-        AgriBot
+        Cropsphere.ai
       </p>
     </div>
   );

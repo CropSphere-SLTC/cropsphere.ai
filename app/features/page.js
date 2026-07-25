@@ -2,7 +2,7 @@ import { getFeatures } from '@/lib/data';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
-export const metadata = { title: 'Features — AgriBot' };
+export const metadata = { title: 'Features — Cropsphere.ai' };
 
 export default async function FeaturesPage() {
   const features = await getFeatures();
@@ -11,7 +11,7 @@ export default async function FeaturesPage() {
     <section className="container-site py-16">
       <h1 className="section-title text-center">Features</h1>
       <p className="mt-4 text-center text-gray-600 max-w-2xl mx-auto">
-        Everything AgriBot offers to help you farm smarter.
+        Everything Cropsphere.ai offers to help you farm smarter.
       </p>
       <div className="mt-12 grid gap-6 sm:grid-cols-2">
         {features.map((f, i) => (

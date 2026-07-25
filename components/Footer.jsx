@@ -13,7 +13,7 @@ export default function Footer() {
       <div className="container-site py-10 grid gap-8 sm:grid-cols-3">
         <div>
           <p className="font-extrabold text-lg text-white flex items-center gap-2">
-            <BrandMark size={24} /> AgriBot
+            <BrandMark size={24} /> Cropsphere.ai
           </p>
           <p className="mt-2 text-sm text-leaf-200">
             AI-powered farming guidance for the farmers of Sri Lanka. A final year
@@ -38,7 +38,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-leaf-800 py-4 text-center text-xs text-leaf-300">
-        © {new Date().getFullYear()} AgriBot · TCC Group. All rights reserved.
+        © {new Date().getFullYear()} Cropsphere.ai · TCC Group. All rights reserved.
       </div>
     </footer>
   );

@@ -8,15 +8,15 @@ import { getMotionSettings } from '@/lib/data';
 export const revalidate = 60;
 
 const description =
-  'AgriBot is an AI chatbot helping Sri Lankan farmers plan crops, estimate earnings, and make smarter farming decisions.';
+  'Cropsphere.ai is an AI chatbot helping Sri Lankan farmers plan crops, estimate earnings, and make smarter farming decisions.';
 
 export const metadata = {
-  title: 'AgriBot — AI Farming Assistant for Sri Lanka',
+  title: 'Cropsphere.ai — AI Farming Assistant for Sri Lanka',
   description,
   // The favicon comes from app/icon.svg and app/apple-icon.png via the App
   // Router file conventions — the same artwork as the loader.
   openGraph: {
-    title: 'AgriBot — AI Farming Assistant for Sri Lanka',
+    title: 'Cropsphere.ai — AI Farming Assistant for Sri Lanka',
     description,
     images: ['/og.png'],
     type: 'website',

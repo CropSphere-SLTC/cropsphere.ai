@@ -1,6 +1,6 @@
-# 🌱 AgriBot — Informational Website
+# 🌱 Cropsphere.ai — Informational Website
 
-Informational site for the AgriBot final year project (AI chatbot for Sri Lankan farmers), with a public site and an admin portal for updating all content.
+Informational site for the Cropsphere.ai final year project (AI chatbot for Sri Lankan farmers), with a public site and an admin portal for updating all content.
 
 **Stack:** Next.js 14 (App Router) · Tailwind CSS · Supabase (database, auth, storage) · Vercel (hosting)
 
