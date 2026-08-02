@@ -11,7 +11,7 @@ export default async function HowItWorksPage() {
     <section className="container-site py-16 max-w-3xl">
       <h1 className="section-title text-center">How It Works</h1>
       <p className="mt-4 text-center text-gray-600">
-        From question to answer in seconds.
+        From your farm to your plan, in four simple steps.
       </p>
       <ol className="mt-12">
         {steps.map((s, i) => (

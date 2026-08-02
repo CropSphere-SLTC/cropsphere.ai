@@ -10,9 +10,9 @@ export default async function NewsPage() {
 
   return (
     <section className="container-site py-16">
-      <h1 className="section-title text-center">News & Newsletters</h1>
+      <h1 className="section-title text-center">News & Updates</h1>
       <p className="mt-4 text-center text-gray-600">
-        Updates from the Cropsphere.ai project.
+        What's new with CropSphere. New features, farming tips, and seasonal updates.
       </p>
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((p, i) => (

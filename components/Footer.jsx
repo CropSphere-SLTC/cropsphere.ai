@@ -16,8 +16,8 @@ export default function Footer() {
             <BrandMark size={24} /> Cropsphere.ai
           </p>
           <p className="mt-2 text-sm text-leaf-200">
-            AI-powered farming guidance for the farmers of Sri Lanka. A final year
-            project by TCC Group.
+            AI-powered farming tools for Sri Lankan farmers. 
+            Built with care by TCC Group at SLTC.
           </p>
         </div>
         <div>

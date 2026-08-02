@@ -11,7 +11,8 @@ export default async function TeamPage() {
     <section className="container-site py-16">
       <h1 className="section-title text-center">Our Team</h1>
       <p className="mt-4 text-center text-gray-600 max-w-2xl mx-auto">
-        The students behind Cropsphere.ai — TCC Group.
+        Meet the team behind CropSphere. Three final-year students at SLTC 
+        building AI tools to help Sri Lankan farmers grow smarter.
       </p>
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3 max-w-4xl mx-auto">
         {team.map((m, i) => (

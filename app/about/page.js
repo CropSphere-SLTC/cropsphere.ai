@@ -20,8 +20,9 @@ export default async function AboutPage() {
               <span aria-hidden="true">🎯</span> Our Mission
             </h3>
             <p className="mt-2 text-gray-600 text-sm">
-              Make expert agricultural knowledge accessible to every farmer in Sri
-              Lanka, regardless of location or education level.
+              Help every Sri Lankan farmer grow the right crops, at the right time, 
+              and sell at the best price. It doesn't matter where you live or 
+              what you know. CropSphere puts expert farming knowledge in your hands.
             </p>
           </div>
         </Reveal>
@@ -31,8 +32,9 @@ export default async function AboutPage() {
               <span aria-hidden="true">🌏</span> Our Vision
             </h3>
             <p className="mt-2 text-gray-600 text-sm">
-              A future where technology empowers rural farming communities to plan
-              confidently and prosper sustainably.
+              We see a Sri Lanka where every farmer has access to the same crop data, 
+              weather forecasts, and market information that large farms use. 
+              And it should be completely free for everyone.
             </p>
           </div>
         </Reveal>

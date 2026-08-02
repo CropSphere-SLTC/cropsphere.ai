@@ -30,7 +30,7 @@ export default async function HomePage() {
           </p>
           <div className="animate-fade-up mt-8 flex flex-wrap gap-4 justify-center [animation-delay:240ms]">
             <a href={hero.cta_link || '#'} className="btn-primary">{hero.cta}</a>
-            <Link href="/how-it-works" className="btn-secondary">How It Works</Link>
+            <Link href="/how-it-works" className="btn-secondary">See How It Works</Link>
           </div>
         </div>
       </section>
