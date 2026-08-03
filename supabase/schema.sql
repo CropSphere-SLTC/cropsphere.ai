@@ -13,15 +13,20 @@ create table if not exists posts (
   created_at timestamptz default now()
 );
 
--- Team members
+-- Team members (and project supervisors, split by `category`)
 create table if not exists team_members (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   role text default '',
   bio text default '',
   photo_url text default '',
-  sort_order int default 0
+  sort_order int default 0,
+  category text default 'member'   -- 'member' | 'supervisor'
 );
+
+-- Existing installs: run this once to add the column.
+-- alter table team_members
+--   add column if not exists category text default 'member';
 
 -- Editable site content (hero text, about, features, steps, contact)
 create table if not exists site_content (

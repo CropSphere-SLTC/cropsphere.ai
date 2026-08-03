@@ -7,7 +7,7 @@ import Spinner from '@/components/motion/Spinner';
 import { ErrorMessage } from '@/components/ui/StatusMessage';
 import { SkeletonRegion, AdminRowSkeleton } from '@/components/ui/Skeleton';
 
-const empty = { name: '', role: '', bio: '', photo_url: '', sort_order: 0 };
+const empty = { name: '', role: '', bio: '', photo_url: '', sort_order: 0, category: 'member' };
 
 export default function AdminTeam() {
   const [team, setTeam] = useState([]);
@@ -62,7 +62,13 @@ export default function AdminTeam() {
     return (
       <form onSubmit={save} className="max-w-xl">
         <h1 className="text-2xl font-bold text-leaf-900">
-          {form.id ? 'Edit Member' : 'Add Team Member'}
+          {form.category === 'supervisor'
+            ? form.id
+              ? 'Edit Supervisor'
+              : 'Add Supervisor'
+            : form.id
+              ? 'Edit Member'
+              : 'Add Team Member'}
         </h1>
         <div className="mt-6 card space-y-4">
           <div>
@@ -97,6 +103,20 @@ export default function AdminTeam() {
             value={form.photo_url}
             onChange={(url) => setForm({ ...form, photo_url: url })}
           />
+          <div>
+            <label className="label" htmlFor="member-category">
+              Category
+            </label>
+            <select
+              id="member-category"
+              className="input"
+              value={form.category ?? 'member'}
+              onChange={(e) => setForm({ ...form, category: e.target.value })}
+            >
+              <option value="member">Team Member</option>
+              <option value="supervisor">Supervisor</option>
+            </select>
+          </div>
           <div>
             <label className="label">Display order (lower = first)</label>
             <input
@@ -165,7 +185,14 @@ export default function AdminTeam() {
                 </div>
               )}
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-leaf-900">{m.name}</p>
+                <p className="flex items-center gap-2 font-semibold text-leaf-900">
+                  <span className="truncate">{m.name}</span>
+                  {m.category === 'supervisor' && (
+                    <span className="shrink-0 rounded-full bg-leaf-100 px-2 py-0.5 text-xs font-medium text-leaf-700">
+                      Supervisor
+                    </span>
+                  )}
+                </p>
                 <p className="text-sm text-gray-500">{m.role}</p>
               </div>
               <button
