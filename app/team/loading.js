@@ -23,8 +23,8 @@ export default function Loading() {
         Project Supervisors
       </h2>
       <p className="mt-3 text-center text-gray-600 max-w-2xl mx-auto">
-        Our thanks to the supervisors who guided the CropSphere project and this
-        website from first idea to final build.
+        The academic and industry experts who guided the CropSphere project 
+        from concept to completion.
       </p>
 
       <SkeletonRegion

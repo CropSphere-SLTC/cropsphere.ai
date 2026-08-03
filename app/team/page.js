@@ -59,8 +59,8 @@ export default async function TeamPage() {
             Project Supervisors
           </h2>
           <p className="mt-3 text-center text-gray-600 max-w-2xl mx-auto">
-            Our thanks to the supervisors who guided the CropSphere project and this
-            website from first idea to final build.
+            The lecturers who supervised and supported us throughout 
+            the CropSphere project.
           </p>
           {/* Centred flex rather than a grid: there are usually only one or two
               supervisors, and a grid would strand a lone card on the left. */}
