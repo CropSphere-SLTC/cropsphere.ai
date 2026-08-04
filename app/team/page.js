@@ -1,4 +1,5 @@
 import { getTeam } from '@/lib/data';
+import { safeImageUrl } from '@/lib/safeUrl';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
@@ -7,12 +8,14 @@ export const metadata = { title: 'Our Team — Cropsphere.ai' };
 // Shared by both blocks below — supervisors and students carry the same shape,
 // so they get the same card and the same 👤 fallback avatar.
 function PersonCard({ person }) {
+  // Sanitised before the ternary so a rejected URL shows the 👤 fallback.
+  const photo = safeImageUrl(person.photo_url);
   return (
     <div className="card-static h-full text-center">
-      {person.photo_url ? (
+      {photo ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={person.photo_url}
+          src={photo}
           alt={person.name}
           className="w-24 h-24 rounded-full object-cover mx-auto"
         />

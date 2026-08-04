@@ -24,16 +24,23 @@ Open http://localhost:3000
 
 1. Create a project at https://supabase.com (free tier).
 2. In the dashboard, open **SQL Editor**, paste the contents of `supabase/schema.sql`, and run it.
-3. Go to **Authentication → Users → Add user** and create your admin account (email + password). Disable public signups in Authentication → Providers if desired (recommended — anyone who signs up gets admin access under the default policies).
-4. Go to **Project Settings → API** and copy the Project URL and anon key.
-5. Copy `.env.local.example` to `.env.local` and paste the values:
+3. Go to **Authentication → Users → Add user** and create your admin account (email + password), then **disable public signups** in Authentication → Providers.
+4. Grant that account admin rights — logging in is not enough on its own. In the SQL Editor, run the `insert into admin_users …` statement at the bottom of `supabase/schema.sql` with your email.
+5. Go to **Project Settings → API** and copy the Project URL and anon key.
+6. Copy `.env.local.example` to `.env.local` and paste the values:
 
 ```
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=eyJ...
 ```
 
-6. Restart `npm run dev`, visit `/admin/login`, and log in.
+7. Restart `npm run dev`, visit `/admin/login`, and log in.
+8. Turn on two-factor authentication at **Admin → Security** (recommended).
+
+> **Upgrading an existing install?** Run `supabase/security.sql` once instead —
+> it migrates the old "any logged-in user is an admin" policies to the
+> allowlist. Read the comments at the top first; you must set your own email in
+> STEP 5 or you will lock yourself out.
 
 ## 3. Deploy free on Vercel
 
@@ -52,5 +59,5 @@ Content changes made in the admin portal appear on the public site within ~60 se
 
 ## Notes
 
-- Security model: any authenticated Supabase user is an admin (RLS policies in `schema.sql`). Keep signups disabled and create admin users manually.
-- Images uploaded in the admin portal go to the public `images` storage bucket.
+- Security model: writing anything requires membership of the `admin_users` allowlist, which can only be changed from the Supabase SQL editor. See [SECURITY.md](SECURITY.md) for the full set of controls and a verification checklist.
+- Images uploaded in the admin portal go to the public `images` storage bucket. Only JPG/PNG/WebP/AVIF up to 5 MB are accepted; SVG is refused because it can carry script.

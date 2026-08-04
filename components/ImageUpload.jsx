@@ -2,6 +2,8 @@
 
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { safeImageUrl } from '@/lib/safeUrl';
+import { validateImageFile, uploadPath } from '@/lib/imageFile';
 import Spinner from '@/components/motion/Spinner';
 import { ErrorMessage, StatusMessage } from '@/components/ui/StatusMessage';
 
@@ -15,8 +17,27 @@ export default function ImageUpload({ value, onChange, label = 'Image' }) {
     if (!file) return;
     setBusy(true);
     setError('');
-    const path = `${Date.now()}-${file.name.replace(/[^a-zA-Z0-9.-]/g, '_')}`;
-    const { error: upErr } = await supabase.storage.from('images').upload(path, file);
+
+    // Type, size and magic-byte checks — see lib/imageFile.js for why each one
+    // is needed given the bucket is publicly readable.
+    const problem = await validateImageFile(file);
+    if (problem) {
+      setError(problem);
+      setBusy(false);
+      // Let the same file be re-picked after a fix, which otherwise fires no
+      // change event the second time.
+      e.target.value = '';
+      return;
+    }
+
+    const path = uploadPath(file);
+    const { error: upErr } = await supabase.storage
+      .from('images')
+      .upload(path, file, {
+        contentType: file.type,
+        cacheControl: '3600',
+        upsert: false,
+      });
     if (upErr) {
       setError(upErr.message);
     } else {
@@ -24,23 +45,25 @@ export default function ImageUpload({ value, onChange, label = 'Image' }) {
       onChange(data.publicUrl);
     }
     setBusy(false);
+    e.target.value = '';
   }
 
   return (
     <div aria-busy={busy}>
       <label className="label">{label}</label>
-      {value && (
+      {safeImageUrl(value) && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
           key={value}
-          src={value}
+          src={safeImageUrl(value)}
           alt=""
           className="animate-scale-in h-24 rounded-lg object-cover mb-2"
         />
       )}
       <input
         type="file"
-        accept="image/*"
+        // A picker hint only — validateImageFile is the actual gate.
+        accept="image/jpeg,image/png,image/webp,image/avif"
         onChange={handleFile}
         // Was enabled during upload, so a second file could be picked mid-flight.
         disabled={busy}

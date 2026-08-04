@@ -40,9 +40,19 @@ export default function AdminPosts() {
     e.preventDefault();
     setBusy(true);
     setError('');
-    const row = { ...form, slug: form.slug || slugify(form.title) };
-    const { error: err } = row.id
-      ? await supabase.from('posts').update(row).eq('id', row.id)
+    // Explicit column list rather than spreading `form`: this keeps `id` and
+    // `created_at` out of the payload on edit, and stops client state from
+    // introducing a column the table did not expect.
+    const row = {
+      title: form.title,
+      slug: form.slug || slugify(form.title),
+      excerpt: form.excerpt,
+      content: form.content,
+      cover_url: form.cover_url,
+      published: form.published,
+    };
+    const { error: err } = form.id
+      ? await supabase.from('posts').update(row).eq('id', form.id)
       : await supabase.from('posts').insert(row);
     setBusy(false);
     if (err) return setError(err.message);

@@ -1,0 +1,7 @@
+# Cropsphere.ai — security contact (RFC 9116)
+# If you have found a security issue with this site, please tell us before
+# disclosing it publicly. We will confirm receipt as soon as we can.
+
+Contact: mailto:tccgroup2025@gmail.com
+Expires: 2027-08-04T00:00:00.000Z
+Preferred-Languages: en

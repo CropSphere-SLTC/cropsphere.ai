@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { defaultContent, defaultFeatures, defaultSteps } from '@/lib/defaults';
+import { validateLinkInput, isEmailish } from '@/lib/safeUrl';
 import Spinner from '@/components/motion/Spinner';
 import { ErrorMessage, StatusMessage } from '@/components/ui/StatusMessage';
 
@@ -78,9 +79,24 @@ export default function AdminContent() {
     load();
   }, []);
 
+  // Rejects values that the public site would refuse to render anyway, so the
+  // admin sees the reason here instead of a silently dead button on the
+  // homepage. `lib/safeUrl.js` is still the authority at render time.
+  function validate(key, value) {
+    if (key === 'hero') return validateLinkInput(value.cta_link, 'Button link');
+    if (key === 'contact' && value.email && !isEmailish(value.email)) {
+      return `"${value.email}" is not a valid email address.`;
+    }
+    return '';
+  }
+
   async function save(key, value) {
     setError('');
     setSaved('');
+
+    const problem = validate(key, value);
+    if (problem) return setError(problem);
+
     // Was missing entirely, so the button stayed live during the write and
     // could be submitted twice.
     setSavingKey(key);

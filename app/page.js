@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getContent, getFeatures, getPosts } from '@/lib/data';
+import { safeUrl, safeImageUrl } from '@/lib/safeUrl';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
@@ -11,6 +12,9 @@ export default async function HomePage() {
     getPosts(),
   ]);
   const latest = posts.slice(0, 3);
+  // The CTA link is admin-editable free text, so it is sanitised once here and
+  // reused by both buttons — a `javascript:` URL collapses to '#'.
+  const ctaHref = safeUrl(hero.cta_link);
 
   return (
     <>
@@ -29,7 +33,7 @@ export default async function HomePage() {
             {hero.subtitle}
           </p>
           <div className="animate-fade-up mt-8 flex flex-wrap gap-4 justify-center [animation-delay:240ms]">
-            <a href={hero.cta_link || '#'} className="btn-primary">{hero.cta}</a>
+            <a href={ctaHref} className="btn-primary">{hero.cta}</a>
             <Link href="/how-it-works" className="btn-secondary">See How It Works</Link>
           </div>
         </div>
@@ -73,32 +77,37 @@ export default async function HomePage() {
             </Link>
           </Reveal>
           <div className="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {latest.map((p, i) => (
-              <Reveal key={p.id} delay={Math.min(i, 5) * 80} className="h-full">
-                <Link
-                  href={`/news/${p.slug}`}
-                  className="card-link group block h-full"
-                >
-                  <div className="mb-4 overflow-hidden rounded-xl">
-                    {p.cover_url ? (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={p.cover_url}
-                        alt=""
-                        className="h-40 w-full object-cover transition-transform duration-500 ease-out-expo group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="h-40 w-full bg-leaf-100 flex items-center justify-center text-4xl" aria-hidden="true">🌾</div>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-400">
-                    {new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-                  </p>
-                  <h3 className="mt-1 font-bold text-leaf-900">{p.title}</h3>
-                  <p className="mt-2 text-sm text-gray-600 line-clamp-3">{p.excerpt}</p>
-                </Link>
-              </Reveal>
-            ))}
+            {latest.map((p, i) => {
+              // Branch on the sanitised URL, not the raw one: a rejected value
+              // then falls back to the 🌾 placeholder instead of a broken image.
+              const cover = safeImageUrl(p.cover_url);
+              return (
+                <Reveal key={p.id} delay={Math.min(i, 5) * 80} className="h-full">
+                  <Link
+                    href={`/news/${p.slug}`}
+                    className="card-link group block h-full"
+                  >
+                    <div className="mb-4 overflow-hidden rounded-xl">
+                      {cover ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={cover}
+                          alt=""
+                          className="h-40 w-full object-cover transition-transform duration-500 ease-out-expo group-hover:scale-105"
+                        />
+                      ) : (
+                        <div className="h-40 w-full bg-leaf-100 flex items-center justify-center text-4xl" aria-hidden="true">🌾</div>
+                      )}
+                    </div>
+                    <p className="text-xs text-gray-400">
+                      {new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                    </p>
+                    <h3 className="mt-1 font-bold text-leaf-900">{p.title}</h3>
+                    <p className="mt-2 text-sm text-gray-600 line-clamp-3">{p.excerpt}</p>
+                  </Link>
+                </Reveal>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -111,7 +120,7 @@ export default async function HomePage() {
             <p className="mt-3 text-leaf-100 max-w-xl mx-auto">
               Join farmers across Sri Lanka using Cropsphere.ai to plan better and earn more.
             </p>
-            <a href={hero.cta_link || '#'} className="btn-secondary mt-6">{hero.cta}</a>
+            <a href={ctaHref} className="btn-secondary mt-6">{hero.cta}</a>
           </div>
         </Reveal>
       </section>

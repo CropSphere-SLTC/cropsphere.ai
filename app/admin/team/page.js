@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { safeImageUrl } from '@/lib/safeUrl';
 import ImageUpload from '@/components/ImageUpload';
 import Spinner from '@/components/motion/Spinner';
 import { ErrorMessage } from '@/components/ui/StatusMessage';
@@ -34,9 +35,18 @@ export default function AdminTeam() {
     e.preventDefault();
     setBusy(true);
     setError('');
-    const row = { ...form, sort_order: Number(form.sort_order) || 0 };
-    const { error: err } = row.id
-      ? await supabase.from('team_members').update(row).eq('id', row.id)
+    // Explicit column list rather than spreading `form`: client state can then
+    // never introduce a column the table did not expect.
+    const row = {
+      name: form.name,
+      role: form.role,
+      bio: form.bio,
+      photo_url: form.photo_url,
+      category: form.category,
+      sort_order: Number(form.sort_order) || 0,
+    };
+    const { error: err } = form.id
+      ? await supabase.from('team_members').update(row).eq('id', form.id)
       : await supabase.from('team_members').insert(row);
     setBusy(false);
     if (err) return setError(err.message);
@@ -173,9 +183,9 @@ export default function AdminTeam() {
                 pendingId === m.id ? 'opacity-60' : ''
               }`}
             >
-              {m.photo_url ? (
+              {safeImageUrl(m.photo_url) ? (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={m.photo_url} alt="" className="w-12 h-12 rounded-full object-cover" />
+                <img src={safeImageUrl(m.photo_url)} alt="" className="w-12 h-12 rounded-full object-cover" />
               ) : (
                 <div
                   className="w-12 h-12 rounded-full bg-leaf-100 flex items-center justify-center"

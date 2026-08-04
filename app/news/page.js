@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { getPosts } from '@/lib/data';
+import { safeImageUrl } from '@/lib/safeUrl';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
@@ -15,29 +16,34 @@ export default async function NewsPage() {
         What's new with CropSphere. New features, farming tips, and seasonal updates.
       </p>
       <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-        {posts.map((p, i) => (
-          <Reveal key={p.id} delay={Math.min(i, 5) * 80} className="h-full">
-            <Link href={`/news/${p.slug}`} className="card-link group block h-full">
-              <div className="mb-4 overflow-hidden rounded-xl">
-                {p.cover_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={p.cover_url}
-                    alt=""
-                    className="h-44 w-full object-cover transition-transform duration-500 ease-out-expo group-hover:scale-105"
-                  />
-                ) : (
-                  <div className="h-44 w-full bg-leaf-100 flex items-center justify-center text-5xl" aria-hidden="true">🌾</div>
-                )}
-              </div>
-              <p className="text-xs text-gray-400">
-                {new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-              </p>
-              <h2 className="mt-1 font-bold text-leaf-900 text-lg">{p.title}</h2>
-              <p className="mt-2 text-sm text-gray-600 line-clamp-3">{p.excerpt}</p>
-            </Link>
-          </Reveal>
-        ))}
+        {posts.map((p, i) => {
+          // Branch on the sanitised URL so a rejected value falls back to the
+          // 🌾 placeholder rather than rendering a broken image.
+          const cover = safeImageUrl(p.cover_url);
+          return (
+            <Reveal key={p.id} delay={Math.min(i, 5) * 80} className="h-full">
+              <Link href={`/news/${p.slug}`} className="card-link group block h-full">
+                <div className="mb-4 overflow-hidden rounded-xl">
+                  {cover ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={cover}
+                      alt=""
+                      className="h-44 w-full object-cover transition-transform duration-500 ease-out-expo group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="h-44 w-full bg-leaf-100 flex items-center justify-center text-5xl" aria-hidden="true">🌾</div>
+                  )}
+                </div>
+                <p className="text-xs text-gray-400">
+                  {new Date(p.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                </p>
+                <h2 className="mt-1 font-bold text-leaf-900 text-lg">{p.title}</h2>
+                <p className="mt-2 text-sm text-gray-600 line-clamp-3">{p.excerpt}</p>
+              </Link>
+            </Reveal>
+          );
+        })}
       </div>
     </section>
   );

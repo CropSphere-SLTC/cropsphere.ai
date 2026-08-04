@@ -1,4 +1,5 @@
 import { getContent } from '@/lib/data';
+import { isEmailish } from '@/lib/safeUrl';
 import Reveal from '@/components/motion/Reveal';
 
 export const revalidate = 60;
@@ -20,9 +21,16 @@ export default async function ContactPage() {
             <span className="text-3xl" aria-hidden="true">📧</span>
             <div>
               <p className="font-semibold text-leaf-800">Email</p>
-              <a href={`mailto:${contact.email}`} className="link-underline text-leaf-600">
-                {contact.email}
-              </a>
+              {/* The `mailto:` scheme is fixed by this template, so the address
+                  cannot smuggle in another one — the check below only stops a
+                  malformed value producing a dead link. */}
+              {isEmailish(contact.email) ? (
+                <a href={`mailto:${contact.email}`} className="link-underline text-leaf-600">
+                  {contact.email}
+                </a>
+              ) : (
+                <p className="text-gray-600">{contact.email}</p>
+              )}
             </div>
           </div>
         </Reveal>

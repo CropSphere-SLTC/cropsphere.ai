@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { getPost } from '@/lib/data';
+import { safeImageUrl } from '@/lib/safeUrl';
 
 export const revalidate = 60;
 
@@ -19,6 +20,9 @@ export default async function PostPage({ params }) {
   const post = await getPost(params.slug);
   if (!post) notFound();
 
+  // Admin-supplied URL — anything that is not http(s) is dropped entirely.
+  const cover = safeImageUrl(post.cover_url);
+
   return (
     // Long-form prose gets no scroll reveal — animating text as the reader
     // arrives at it fights the act of reading.
@@ -33,10 +37,10 @@ export default async function PostPage({ params }) {
         {new Date(post.created_at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
       </p>
       <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-leaf-900">{post.title}</h1>
-      {post.cover_url && (
+      {cover && (
         // eslint-disable-next-line @next/next/no-img-element
         <img
-          src={post.cover_url}
+          src={cover}
           alt=""
           className="animate-scale-in mt-6 rounded-2xl w-full object-cover max-h-96"
         />
