@@ -44,7 +44,30 @@ export default function AdminSecurity() {
     setBusy(false);
     if (err) return setError(err.message);
     setCode('');
-    setEnrolling({ id: data.id, qr: data.totp.qr_code, secret: data.totp.secret });
+    setEnrolling({
+      id: data.id,
+      qr: data.totp.qr_code,
+      secret: data.totp.secret,
+      // The otpauth:// URI behind the QR. Kept as a last resort for a phone
+      // camera that will not scan and an app that will not accept the key.
+      uri: data.totp.uri,
+    });
+  }
+
+  // Base32 secrets are long and easy to mistype. Groups of four are far easier
+  // to copy across to a phone by hand.
+  function chunked(secret) {
+    return (secret.match(/.{1,4}/g) ?? []).join(' ');
+  }
+
+  async function copySecret() {
+    try {
+      await navigator.clipboard.writeText(enrolling.secret);
+      setStatus('Setup key copied.');
+      setTimeout(() => setStatus(''), 2000);
+    } catch {
+      setError('Could not copy automatically — select the key and copy it manually.');
+    }
   }
 
   async function confirmEnrol(e) {
@@ -126,22 +149,59 @@ export default function AdminSecurity() {
           </div>
         ) : enrolling ? (
           <form onSubmit={confirmEnrol} className="space-y-4">
-            <ol className="space-y-4 text-sm text-gray-700">
+            <ol className="space-y-5 text-sm text-gray-700">
               <li>
                 <strong>1.</strong> Scan this with Google Authenticator, Authy,
                 or your password manager.
-                <div className="mt-2 inline-block rounded-xl border border-leaf-100 bg-white p-3">
+                {/* Rendered large on a plain white plate with generous padding:
+                    a QR needs a quiet zone around it, and phone cameras
+                    routinely fail on a small or tightly-cropped code. */}
+                <div className="mt-2 inline-block rounded-xl border border-leaf-100 bg-white p-5">
                   {/* Supabase returns the QR as an inline SVG data URI, which
                       is why the CSP img-src allows data:. */}
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img src={enrolling.qr} alt="Two-factor setup QR code" className="h-44 w-44" />
+                  <img
+                    src={enrolling.qr}
+                    alt="Two-factor setup QR code"
+                    className="block h-56 w-56 bg-white"
+                  />
                 </div>
               </li>
               <li>
-                <strong>2.</strong> Can&apos;t scan? Enter this key by hand:
-                <code className="mt-1 block break-all rounded bg-leaf-50 px-2 py-1 font-mono text-xs">
-                  {enrolling.secret}
-                </code>
+                <strong>2.</strong> Can&apos;t scan it? Add it by hand instead —
+                this always works.
+                <div className="mt-2 rounded-lg border border-leaf-100 bg-leaf-50 p-3">
+                  <p className="text-xs font-semibold uppercase tracking-wide text-leaf-700">
+                    Setup key
+                  </p>
+                  <code className="mt-1 block break-all font-mono text-base tracking-wider text-leaf-900">
+                    {chunked(enrolling.secret)}
+                  </code>
+                  <button
+                    type="button"
+                    onClick={copySecret}
+                    className="mt-2 text-xs font-semibold text-leaf-700 transition-colors hover:text-leaf-900 hover:underline"
+                  >
+                    <span aria-hidden="true">📋</span> Copy key
+                  </button>
+                  <p className="mt-3 text-xs leading-relaxed text-gray-600">
+                    In Google Authenticator: tap <strong>+</strong> →{' '}
+                    <strong>Enter a setup key</strong> → type any account name →
+                    paste the key above → leave the type as{' '}
+                    <strong>Time based</strong> → <strong>Add</strong>. Spaces
+                    and capitalisation do not matter.
+                  </p>
+                  {/* Most password managers accept the otpauth:// URI pasted
+                      directly, which is quicker than either other route. */}
+                  <details className="mt-3">
+                    <summary className="cursor-pointer text-xs text-gray-500 hover:text-gray-700">
+                      Using a password manager? Show the setup link
+                    </summary>
+                    <code className="mt-2 block break-all rounded bg-white px-2 py-1 font-mono text-[11px] text-gray-600">
+                      {enrolling.uri}
+                    </code>
+                  </details>
+                </div>
               </li>
               <li>
                 <strong>3.</strong> Type the 6-digit code it shows:

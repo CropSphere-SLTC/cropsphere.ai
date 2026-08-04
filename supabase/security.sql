@@ -70,9 +70,17 @@ alter table posts        enable row level security;
 alter table team_members enable row level security;
 alter table site_content enable row level security;
 
+-- The original, over-permissive policies.
 drop policy if exists "admin all posts"   on posts;
 drop policy if exists "admin all team"    on team_members;
 drop policy if exists "admin all content" on site_content;
+
+-- This file's own policy names, dropped too so the whole script can be re-run
+-- safely — otherwise a second run fails with "policy already exists" before it
+-- reaches STEP 5, which is where you add another admin.
+drop policy if exists "admin write posts"   on posts;
+drop policy if exists "admin write team"    on team_members;
+drop policy if exists "admin write content" on site_content;
 
 create policy "admin write posts" on posts
   for all to authenticated
@@ -113,7 +121,7 @@ create policy "admin delete images" on storage.objects
 -- ---------------------------------------------------------------------------
 insert into admin_users (user_id, email)
 select id, email from auth.users
-where email = 'tccgroup2025@gmail.com'   -- <<< change to your admin login
+where email in ('tccgroup2025@gmail.com', 'shifanabs55@gmail.com')   -- <<< change to your admin login
 on conflict (user_id) do nothing;
 
 commit;
