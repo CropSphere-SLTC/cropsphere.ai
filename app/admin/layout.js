@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase, supabaseConfigured } from '@/lib/supabase';
-import useIdleLogout from '@/lib/useIdleLogout';
+import useIdleLogout, { clearActivity } from '@/lib/useIdleLogout';
 import BrandMark from '@/components/brand/BrandMark';
 import BrandLoader from '@/components/brand/BrandLoader';
 import Spinner from '@/components/motion/Spinner';
@@ -65,6 +65,7 @@ export default function AdminLayout({ children }) {
 
   const handleIdleExpire = useCallback(async () => {
     await supabase.auth.signOut();
+    clearActivity();
     router.replace('/admin/login');
   }, [router]);
 
@@ -105,6 +106,7 @@ export default function AdminLayout({ children }) {
   async function logout() {
     setLoggingOut(true);
     await supabase.auth.signOut();
+    clearActivity();
     router.replace('/admin/login');
   }
 

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase, supabaseConfigured } from '@/lib/supabase';
+import { markActivityNow, clearActivity } from '@/lib/useIdleLogout';
 import BrandMark from '@/components/brand/BrandMark';
 import Spinner from '@/components/motion/Spinner';
 import { ErrorMessage } from '@/components/ui/StatusMessage';
@@ -30,6 +31,10 @@ export default function LoginPage() {
       setBusy(false);
       return setError(signInErr.message);
     }
+
+    // Signing in *is* activity. Starts the idle window fresh so the countdown
+    // never inherits a timestamp from a previous visit to this browser.
+    markActivityNow();
 
     // The password gave us a session, but on an account with TOTP enrolled that
     // session is only aal1. `nextLevel` tells us aal2 is available and still
@@ -82,6 +87,7 @@ export default function LoginPage() {
       return setError('That code was not accepted. Check the current code in your app.');
     }
 
+    markActivityNow();
     setBusy(false);
     router.replace('/admin');
   }
@@ -89,6 +95,7 @@ export default function LoginPage() {
   // Leaves the half-authenticated aal1 session behind if the user backs out.
   async function cancelMfa() {
     await supabase.auth.signOut();
+    clearActivity();
     setMfa(null);
     setCode('');
     setError('');
