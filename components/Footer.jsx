@@ -17,7 +17,7 @@ export default function Footer() {
           </p>
           <p className="mt-2 text-sm text-leaf-200">
             AI-powered farming tools for Sri Lankan farmers. 
-            Built with care by TCC Group at SLTC.
+            Built with care by Cropsphere Group at SLTC.
           </p>
         </div>
         <div>
@@ -38,7 +38,7 @@ export default function Footer() {
         </div>
       </div>
       <div className="border-t border-leaf-800 py-4 text-center text-xs text-leaf-300">
-        © {new Date().getFullYear()} Cropsphere.ai · TCC Group. All rights reserved.
+        © {new Date().getFullYear()} Cropsphere.ai · Cropsphere Group. All rights reserved.
       </div>
     </footer>
   );
